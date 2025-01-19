@@ -6,7 +6,7 @@
 #    By: eros-gir <eros-gir@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/17 17:14:06 by eros-gir          #+#    #+#              #
-#    Updated: 2024/11/23 21:08:21 by eros-gir         ###   ########.fr        #
+#    Updated: 2025/01/19 17:47:38 by eros-gir         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,9 +17,12 @@ LDFlags = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -LXi
 
 FILES = main.cpp MyVklib.cpp MyVklib.hpp
 
-all: vk-triangle
+all: vk-triangle-release
 
-vk-triangle: $(FILES)
+vk-triangle-release: $(FILES)
+	g++ $(CFLAGS) -DNDEBUG -o vk-triangle $(FILES) $(LDFlags)
+
+vk-triangle-debug: $(FILES)
 	g++ $(CFLAGS) -o vk-triangle $(FILES) $(LDFlags)
 
 clean:
@@ -27,4 +30,6 @@ clean:
 
 fclean: clean
 
-.PHONY: all vk-triangle clean fclean
+debug: vk-triangle-debug
+
+.PHONY: all vk-triangle-release vk-triangle-debug clean fclean debug

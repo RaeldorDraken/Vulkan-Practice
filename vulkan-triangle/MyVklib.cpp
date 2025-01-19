@@ -6,7 +6,7 @@
 /*   By: eros-gir <eros-gir@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 20:37:55 by eros-gir          #+#    #+#             */
-/*   Updated: 2024/11/23 21:09:48 by eros-gir         ###   ########.fr       */
+/*   Updated: 2025/01/19 17:37:35 by eros-gir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,25 @@ void	HelloTriangleApplication::createInstance()
 	VkInstanceCreateInfo	createInfo{}; //Mandatory struct
 	VkResult				result;
 
-	uint32_t	glfwExtensionCount = 0;
-	const char	**glfwExtensions;
+	uint32_t				glfwExtensionCount = 0;
+	const char				**glfwExtensions;
+
+	//Validation Layers for debugging
+	if (enableValidationLayers && !checkValidationLayerSupport())
+	{
+		throw std::runtime_error("Validation layers requested, but not available!");
+	}
+
+	//Testing required extensions
+	uint32_t	extensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+	std::vector<VkExtensionProperties> extensions(extensionCount);
+	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+	std::cout << "avaiable Vk extensions:\n";
+	for (const auto& extension : extensions)
+	{
+		std::cout << '\t' << extension.extensionName << '\n';
+	}
 
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -78,6 +95,29 @@ void	HelloTriangleApplication::createInstance()
 	{
 		throw	std::runtime_error("failed to create instance!");
 	}
+}
+
+bool	HelloTriangleApplication::checkValidationLayerSupport()
+{
+	uint32_t	layerCount;
+	bool		layerFound = false;
+	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+	std::vector<VkLayerProperties>	availableLayers(layerCount);
+	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+	for (const char* layerName : validationLayers)
+	{
+		for (const auto& layerProperties : availableLayers)
+		{
+			if (strcmp(layerName, layerProperties.layerName) == 0)
+			{
+				layerFound = true;
+				break;
+			}
+		}
+	}
+	return	layerFound;
 }
 
 void	HelloTriangleApplication::cleanup()
